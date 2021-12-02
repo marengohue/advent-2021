@@ -1,8 +1,8 @@
 use std::io::{BufRead, stdin};
 
-struct Submarine {
+pub struct Submarine {
     pos: (i32, i32),
-    aim: i32
+    aim: i32,
 }
 
 impl Submarine {
