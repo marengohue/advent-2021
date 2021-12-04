@@ -92,8 +92,8 @@ fn main() {
     extract_life_supp_numbers(diagnostics_remainder, max_len - 1, AnalysisKind::LeastFrequent);
     
     let gamma = global_freqs
-         .iter()
-         .enumerate()
+        .iter()
+        .enumerate()
         .fold(0, |acc, (idx, bit)| acc + 2_u32.pow(idx as u32) * bit);
 
     println!("{}, {}", gamma, epsilon_from_gamma(gamma, max_len as u32));
