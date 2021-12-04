@@ -49,14 +49,11 @@ impl Bingo {
     }
 
     fn get_turn_result(&self, last_marked: Point) -> GameState {
-        // Either row or column is fully marked.
-        // Looks wonky to take advantage of bool logic short circuits
-        // and not allocate extra vectors without need.
-        let reached_win = self.row(last_marked.0)
-            .iter().fold(true, |acc, (_, marked)| acc & marked)
+        let (last_row, last_col) = last_marked;
+        let reached_win =
+            self.row(last_row).iter().all(|&(_, marked)| marked)
             ||
-            self.col(last_marked.1).iter()
-            .fold(true, |acc, (_, marked)| acc & marked);
+            self.col(last_col).iter().all(|&(_, marked)| marked);
 
         if reached_win {
             let &(last_marked_score, _) = self.board.get(&last_marked).unwrap();
