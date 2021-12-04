@@ -154,7 +154,7 @@ fn read_inputs() -> (Vec<u32>, Vec<Bingo>) {
 
 fn main() {
     let (draws, mut bingos) = read_inputs();
-    let mut  place = 0_usize;
+    let mut place = 0_usize;
     
     for draw in draws {
         for bingo in bingos.iter_mut().filter(|b|b.is_playing()) {
@@ -173,6 +173,6 @@ fn main() {
         p0.unwrap_or(usize::MAX).partial_cmp(&p1.unwrap_or(usize::MAX)).unwrap()
     });
     
-    println!("{:?}");
+    println!("{:?}", result);
 }
     
