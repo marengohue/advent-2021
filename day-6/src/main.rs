@@ -1,26 +1,22 @@
 use std::io::{stdin, BufRead};
 
-fn fish(time_till_spawn: u8, days: u32) -> u64 {
-    if time_till_spawn > 0 {
-        fish(0, days - time_till_spawn as u32)
-    } else {
-        let mut fishes: Vec<u64> = vec![0;9];
-        fishes[0] = 1;
+const MAX_FISH_AGE: usize = 8;
+const AGE_AFTER_SPAWN: usize = 6;
+
+// I've done nothing but spin fish for three days.
+fn spin_fish(fish: Vec<u8>, days: u32) -> u64 {    
+    let mut fish_ring: Vec<u64> = vec![0; MAX_FISH_AGE + 1];
+    fish.iter()
+        .for_each(|&fish| fish_ring[fish as usize] += 1);
         
-        for _ in 0..days {
-            let mut to_spawn: u64 = 0;
-            for age in 0..8 {
-                if age == 0 { to_spawn = fishes[0]; }
-                if age == 8 { break; }
-                fishes.swap(age, age + 1);
-            }
-
-            fishes[6] += to_spawn;
-            fishes[8] = to_spawn;
-        }
-
-        fishes.iter().sum()
+    for _ in 0..days {
+        let to_spawn = fish_ring[0];
+        fish_ring.rotate_left(1);
+        fish_ring[MAX_FISH_AGE] = to_spawn;
+        fish_ring[AGE_AFTER_SPAWN] += to_spawn;
     }
+
+    fish_ring.iter().sum()
 }
 
     
@@ -30,11 +26,10 @@ fn main() {
     let mut str_in = String::new();
     handle.read_line(&mut str_in).expect("oh uh...");
 
-    let total: u64 = str_in
+    let fishes = str_in
         .split(',')
         .map(|num| num.trim().parse::<u8>().unwrap())
-        .map(|f| fish(f, 256))
-        .sum();
-
-    println!("{:?}", total);
+        .collect::<Vec<u8>>();
+        
+    println!("Total fish: {:?}", spin_fish(fishes, 256));
 }
