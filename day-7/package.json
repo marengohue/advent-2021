@@ -1,0 +1,17 @@
+{
+  "name": "day-7",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "source": "src/index.coffee",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel build ./src/index.coffee && node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@parcel/transformer-coffeescript": "^2.0.1",
+    "parcel": "^2.0.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
