@@ -9,7 +9,7 @@ let read parser =
     |> Seq.indexed
     |> Seq.map (untuple parser)
     |> Seq.choose id
-    
+
 let intRowParser (lineNo: int) (line: string) =
     line.ToCharArray()
     |> Seq.indexed
@@ -19,24 +19,65 @@ let intRowParser (lineNo: int) (line: string) =
 let board = (read intRowParser) |> Seq.collect id |> Map
 
 let adjacent (x, y) = seq { 
-  (x - 1, y)
-  (x + 1, y)
-  (x, y - 1)
-  (x, y + 1)
+    (x - 1, y)
+    (x + 1, y)
+    (x, y - 1)
+    (x, y + 1)
 }
 
 let foldMap state _ value = state + value
 
 let risk height = 1 + height
 
+let get (board: Map<(int*int), int>) (point: (int*int)) =
+    if (board.ContainsKey point) then
+        Some (board.Item point)
+    else
+        None
+
+let lowPoints board =
+    board
+    |> Map.filter (fun setPoint setVal -> 
+        (adjacent setPoint)
+            |> Seq.choose (get board)
+            |> Seq.forall (fun it -> it > setVal))
+    |> Seq.map (fun kvp -> kvp.Key)
+
+
+let basinFor board point =
+    let toVisit point leftToVisit basin =
+        point
+            |> adjacent
+            |> Seq.filter (fun it -> List.contains it basin |> not)
+            |> Seq.append leftToVisit
+            |> Seq.toList
+            |> List.distinct
+    
+    let rec loop points basin =
+        match points with
+            | p::ps ->
+                match get board p with
+                    | Some(9) -> loop ps basin
+                    | None -> loop ps basin
+                    | Some(_) -> loop (toVisit p ps basin) (p :: basin)
+            | [] -> basin
+            
+    loop [point] []
+    
+
 let sumLowPoints board =
-  board
-  |> Map.filter (fun setPoint setVal -> 
-     (adjacent setPoint)
-       |> Seq.filter board.ContainsKey
-       |> Seq.forall (fun adjPoint -> (board.Item adjPoint) > setVal))
-  |> Map.fold (fun acc _ height -> acc + (risk height)) 0
+    (lowPoints board) |> Seq.fold (fun acc point -> acc + (risk (board.Item point))) 0
 
+let basinsForLowPoints board =
+    lowPoints board
+    |> Seq.map (basinFor board)
+    // Not a thing in the input data, but could happen that multiple
+    // low points are in the same basin
+    |> Seq.distinct
+    |> Seq.map List.length
+    |> Seq.sortDescending
+    |> Seq.take 3
+    |> Seq.reduce (fun acc value -> acc * value)
 
-
-printf "%A" (sumLowPoints board)
+printf "%A " (sumLowPoints board)
+printf "%A" (basinsForLowPoints board)
