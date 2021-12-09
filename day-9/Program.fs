@@ -25,10 +25,6 @@ let adjacent (x, y) = seq {
     (x, y + 1)
 }
 
-let foldMap state _ value = state + value
-
-let risk height = 1 + height
-
 let get (board: Map<(int*int), int>) (point: (int*int)) =
     if (board.ContainsKey point) then
         Some (board.Item point)
@@ -42,7 +38,6 @@ let lowPoints board =
             |> Seq.choose (get board)
             |> Seq.forall (fun it -> it > setVal))
     |> Seq.map (fun kvp -> kvp.Key)
-
 
 let basinFor board point =
     let toVisit point leftToVisit basin =
@@ -66,7 +61,9 @@ let basinFor board point =
     
 
 let sumLowPoints board =
-    (lowPoints board) |> Seq.fold (fun acc point -> acc + (risk (board.Item point))) 0
+    let risk = (+) 1
+    (lowPoints board)
+    |> Seq.fold (fun acc point -> acc + (risk (board.Item point))) 0
 
 let basinsForLowPoints board =
     lowPoints board
@@ -77,7 +74,7 @@ let basinsForLowPoints board =
     |> Seq.map List.length
     |> Seq.sortDescending
     |> Seq.take 3
-    |> Seq.reduce (fun acc value -> acc * value)
+    |> Seq.reduce (*)
 
 printf "%A " (sumLowPoints board)
 printf "%A" (basinsForLowPoints board)
