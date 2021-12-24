@@ -1,0 +1,3 @@
+add x y
+add y z
+eql z 3
